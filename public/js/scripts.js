@@ -30,6 +30,11 @@ App.Init = function () {
   App.inputValue();
 };
 
+// ROB: This method does nothing. You could just write:
+//
+//   return actors;
+//
+// ... and it would have the same effect!
 App.getActorNames = function (actors) {
   return actors.map(function (name) {
     return name;
