@@ -1,0 +1,22 @@
+body {
+    padding: 0 20px;
+}
+input[type=text], #results {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    margin-left: -125px;
+    padding: 15px;
+    max-width: 250px;
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+}
+#results {
+    top: 58%;
+    border: none;
+    list-style: none;
+}
+input[type=text]:focus {
+    outline: 1px solid #3390dd;
+}
