@@ -1,7 +1,5 @@
-// ROB: 'use strict' is missing.
-//
+'use strict';
 // ROB: Method names in this file should probably be alphabetized.
-
 var App = {};
 
 // ROB: Moved "lodash" definition here so that it is separate from the main app code.
@@ -9,10 +7,10 @@ var App = {};
 var _ = {
   compact: function (array) {
     // ROB: I aligned these on = signs.
-    var index  = -1,
-      length   = array ? array.length : 0,
+    var index = -1,
+      length = array ? array.length : 0,
       resIndex = -1,
-      result   = [];
+      result = [];
 
     while (++index < length) {
       var value = array[index];
@@ -24,21 +22,13 @@ var _ = {
   }
 };
 
-// ROB: Why is this method name uppercased?
-App.Init = function () {
-  // ROB: inputValue() does not make sense as a method name, at least to me.
-  App.inputValue();
+App.init = function () {
+  App.DONE_TYPING_INTERVAL = 800;
+  App.searchTerm();
 };
 
-// ROB: This method does nothing. You could just write:
-//
-//   return actors;
-//
-// ... and it would have the same effect!
 App.getActorNames = function (actors) {
-  return actors.map(function (name) {
-    return name;
-  })
+    return actors;
 };
 
 App.makeUL = function (array) {
@@ -90,73 +80,35 @@ App.getData = function () {
   return App.getActorNames(amazonMock[0].fields.actors);
 };
 
-App.inputValue = function () {
+App.searchTerm = function () {
   //setup before functions
   var typingTimer;                //timer identifier
-
-  // ROB: Constants should be defined at the highest level of reuse, and in uppercase.
-  //      This one should probably be App.DONE_TYPING_INTERVAL.
-  var doneTypingInterval = 800;
-
-  // ROB: jQuery reference to #searchBox should be cached for future reuse.
-  //
-  // ROB: Binding to three events creates a potential performance problem.
-  //      When I type an uppercase "I", pushing the "i" key counts as a 'change'
-  //      event, and releasing the Shift key counds as a 'keyup' event. Therefore
-  //      this callback fires *twice* when it should only fire once.
-  //
+  var el;
+  var results;
+  var searchResults = $('#results');
+  var searchInput = $('#searchBox');
   // ROB: I would bind events to a method *name*, rather than inlining the
   //      method body inside of the inputValue() function. That way, inputValue()
   //      can be renamed to something like bindEvents(), and the body of the anonymous
   //      function below could be renamed to something like App.inputChangedListener().
-  $("#searchBox").bind("change keyup paste", function () {
-    console.log('change');
-    clearTimeout(typingTimer);
-    // ROB: What does this timeout do? As far as I can tell it does nothing.
-    //      I commented it out and nothing seems to break!
-    typingTimer = setTimeout(doneTyping, doneTypingInterval);
 
-    // ROB: A reference to this selector could be cached for increased performance.
-    var el = $(this);
-    // Save current value of element
-    el.data('oldVal', el.val());
-
-    // ROB: Re-defining this function with every keystroke is a small performance loss.
-    //user is "finished typing," do something
-    function doneTyping() {
-      // ROB: Why use 'oldVal'? Why not just take the current .val() from the element?
-      //      If the user has stopped typing, then .val() should be the same as 'oldVal'.
-      //
-      // ROB: Why does this timeout callback return a value? Nothing is going to
-      //      consume that value.
-      return _.compact(App.searchStringInArray(el.data('oldVal'), App.getData()));
-    }
-
-    // ROB: jQuery reference to #results should be cached for future reuse.
-    //      For example: var $results = $('#results');
-    $('#results').children().remove();
-    $('#results').append(App.makeUL(doneTyping()));
+  searchInput.bind("keyup paste", function () {
+    el = $(this);
+    results = _.compact(App.searchStringInArray(el.val(), App.getData()));
+    searchResults.children().remove();
+    searchResults.append(App.makeUL(results));
   })
 };
 
 App.searchStringInArray = function (str, strArray) {
-  for (var j = 0; j < strArray.length; j++) {
-    // ROB: Is .match() faster than .indexOf()?
-    //      No! Turns out .test() is fastest! But in any event .match() is very slow!
-    //      https://jsperf.com/exec-vs-match-vs-test-vs-search/11
-    if (strArray[j].match(str)) {
-      // ROB: I don't understand why you are using .map() inside the for loop.
-      //      It looks like just using .map() would do what you want.
-      //      I removed the outer for loop and conditional and everything still worked!
-      return strArray.map(function (name) {
-        return name.match(str);
-      })
-    }
-  }
-  return -1;
+  // ROB: Is .match() faster than .indexOf()?
+  //      No! Turns out .test() is fastest! But in any event .match() is very slow!
+  //      https://jsperf.com/exec-vs-match-vs-test-vs-search/11
+  return strArray.map(function (name) {
+    return name.match(str);
+  });
 };
 
-// ROB: I thought jQuery was not allowed?
 $(document).ready(function () {
-  App.Init();
+  App.init();
 });
